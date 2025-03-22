@@ -1,0 +1,54 @@
+# GotraBandhus: Master Plan
+
+## 1. App Overview and Objectives
+**GotraBandhus** is a web-based application designed to help individuals build and visualize their family tree, fostering connections across generations. Users can manually create their lineage, link with existing family trees, and explore relationships in an interactive and graphical format.
+
+## 2. Target Audience
+- Individuals interested in genealogy and ancestry tracking
+- Families wanting to document and maintain their lineage
+- Communities preserving cultural and familial histories
+
+## 3. Core Features and Functionality
+### a) User Management
+- Local authentication + Google & Facebook authentication
+- Role-based permissions (owner, contributor, viewer)
+
+### b) Family Tree Building
+- Users manually add relationships: **Father, Mother, Wife, Husband, Son, Daughter**
+- Ability to **link/merge** with existing trees (requires approval from the tree owner)
+- UI-driven experience for building the tree **modeled exactly after** [Family Chart](https://donatso.github.io/family-chart-doc/create-tree/)
+
+### c) Privacy & Security
+- Users can **hide personal details** (email, phone, date of birth)
+- Family trees can be **public or private**
+- Deleted data retained for **30 days** before permanent deletion
+
+### d) Visualization & Navigation
+- **Tree view** as the primary visualization, modeled exactly after [Family Chart](https://donatso.github.io/family-chart-doc/create-tree/)
+- **Timeline view** for historical perspective
+- Users can **zoom, drag, search, expand nodes**
+- Export and print functionality
+
+### e) Data Management
+- Admins can **import bulk data**
+- Users can **download backups** in JSON, CSV, or GEDCOM formats
+- **Manual save** option (no auto-save)
+
+### f) Collaboration & Communication
+- Users can **invite family members** to contribute
+- **Real-time collaboration** (different parts of the tree can be edited simultaneously)
+- **Messaging system** for in-app communication
+
+### g) Notifications & Reminders
+- Email notifications for updates, invitations, and approvals
+- Birthday/anniversary reminders
+- Fully customizable notification settings
+
+## 4. High-Level Technical Stack Recommendations
+- **Frontend:** React (for dynamic UI and smooth interactions)
+- **Backend:** Node.js with Express (scalable API handling)
+- **Database:** 
+  - **MongoDB** for user profiles and metadata
+  - **Neo4j** for relationship and ancestry tracking
+- **Authentication:** Local authentication (DB)
+- **Hosting:** AWS/GCP/Azure for scalability
