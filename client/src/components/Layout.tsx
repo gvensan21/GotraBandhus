@@ -85,14 +85,14 @@ export default function Layout({ children }: LayoutProps) {
                   {userMenuOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md overflow-hidden z-50 border">
                       <Link href="/profile">
-                        <a className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
                           Profile
-                        </a>
+                        </div>
                       </Link>
                       <Link href="/settings">
-                        <a className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
                           Settings
-                        </a>
+                        </div>
                       </Link>
                       <button 
                         onClick={logout}
