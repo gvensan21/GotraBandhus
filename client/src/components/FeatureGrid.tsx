@@ -70,20 +70,20 @@ export default function FeatureGrid() {
   ];
 
   return (
-    <section id="features" className="py-16 bg-white px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="features" className="py-16 bg-background px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center mb-16">
         <h2 className="text-3xl font-bold text-primary mb-4">Build Your Family Legacy</h2>
-        <p className="text-gray-600 max-w-2xl mx-auto">Powerful tools to help you document, visualize, and share your ancestry with future generations.</p>
+        <p className="text-muted-foreground max-w-2xl mx-auto">Powerful tools to help you document, visualize, and share your ancestry with future generations.</p>
       </div>
       
       <div className="grid md:grid-cols-3 gap-8">
         {features.map((feature, index) => (
-          <div key={index} className="bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-blue-600">
+          <div key={index} className="bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-border">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4 text-primary">
               {feature.icon}
             </div>
-            <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-            <p className="text-gray-600">{feature.description}</p>
+            <h3 className="text-xl font-semibold mb-3 text-foreground">{feature.title}</h3>
+            <p className="text-muted-foreground">{feature.description}</p>
           </div>
         ))}
       </div>

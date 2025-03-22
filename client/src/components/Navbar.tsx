@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import AuthModal from "./AuthModal";
 import ThemeToggle from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ export default function Navbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"login" | "register">("login");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [location] = useLocation();
 
   const handleLoginClick = () => {
     setModalMode("login");
@@ -45,8 +46,12 @@ export default function Navbar() {
             </div>
             <div className="flex items-center">
               <ThemeToggle />
-              <Button variant="outline" className="ml-4" onClick={handleLoginClick}>Sign In</Button>
-              <Button className="ml-4" onClick={handleRegisterClick}>Get Started</Button>
+              {location !== "/" && (
+                <>
+                  <Button variant="outline" className="ml-4" onClick={handleLoginClick}>Sign In</Button>
+                  <Button className="ml-4" onClick={handleRegisterClick}>Get Started</Button>
+                </>
+              )}
             </div>
             <div className="flex items-center md:hidden">
               <button
@@ -69,6 +74,13 @@ export default function Navbar() {
             <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted">Features</a>
             <a href="#about" className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted">About</a>
             <a href="#contact" className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted">Contact</a>
+            
+            {location !== "/" && (
+              <div className="mt-4 px-3 space-y-2">
+                <Button variant="outline" className="w-full" onClick={handleLoginClick}>Sign In</Button>
+                <Button className="w-full" onClick={handleRegisterClick}>Get Started</Button>
+              </div>
+            )}
           </div>
         </div>
       </nav>
