@@ -38,7 +38,14 @@ export class MongoStorage implements IStorage {
   async getUserById(id: string): Promise<User | null> {
     try {
       const user = await UserModel.findById(id).select('-password');
-      return user ? user.toObject() : null;
+      if (!user) return null;
+      
+      // Convert to regular object and explicitly cast as User
+      const userObj = user.toObject();
+      return {
+        ...userObj,
+        _id: userObj._id?.toString(), // Ensure _id is a string
+      } as unknown as User;
     } catch (error) {
       console.error('Error fetching user by ID:', error);
       return null;
@@ -97,11 +104,8 @@ export class MongoStorage implements IStorage {
       
       // Return user object without password
       const userObj = updatedUser.toObject();
-      const result = { ...userObj };
-      if (result.password) {
-        delete result.password;
-      }
-      return result;
+      const { password, ...resultWithoutPassword } = userObj;
+      return resultWithoutPassword as User;
     } catch (error) {
       console.error('Error updating user profile:', error);
       return null;
@@ -119,16 +123,15 @@ export class MongoStorage implements IStorage {
       if (!isPasswordValid) return null;
       
       // Generate token
-      const token = this.generateToken(user._id.toString());
+      // Convert _id to string safely
+      const userId = user._id ? user._id.toString() : '';
+      const token = this.generateToken(userId);
       
       // Return user data and token
       const userObj = user.toObject();
-      const result = { ...userObj };
-      if (result.password) {
-        delete result.password;
-      }
+      const { password, ...userWithoutPassword } = userObj;
       
-      return { user: result, token };
+      return { user: userWithoutPassword as User, token };
     } catch (error) {
       console.error('Error during login:', error);
       return null;
@@ -347,8 +350,9 @@ export class MemStorage implements IStorage {
       const isPasswordValid = await userDoc.comparePassword(loginData.password);
       if (!isPasswordValid) return null;
       
-      // Get the user ID safely
-      const userId = userDoc._id || '';
+      // Get the user ID safely 
+      const userId = typeof userDoc._id === 'string' ? userDoc._id : '';
+      if (!userId) return null;
       
       // Get user without password
       const user = await this.getUserById(userId);

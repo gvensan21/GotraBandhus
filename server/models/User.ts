@@ -2,9 +2,40 @@ import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { User as UserType } from '@shared/schema';
 
-// Define the user document interface extending both Mongoose Document and our User type
-export interface UserDocument extends UserType, Document {
-  // Add methods to the interface
+// Define the user document interface extending Mongoose Document but including User type properties
+export interface UserDocument extends Document {
+  // User type properties
+  firstName: string;
+  lastName: string;
+  nickname: string;
+  email: string;
+  password: string;
+  phone: string;
+  gender: "male" | "female" | "other";
+  dateOfBirth?: string;
+  birthCity?: string;
+  birthState?: string;
+  birthCountry?: string;
+  currentCity: string;
+  currentState: string;
+  currentCountry: string;
+  gotra: string;
+  pravara: string;
+  occupation?: string;
+  company?: string;
+  industry?: string;
+  primaryLanguage: string;
+  secondaryLanguage?: string;
+  community: string;
+  hideEmail: boolean;
+  hidePhone: boolean;
+  hideDob: boolean;
+  bio?: string;
+  profileCompleted: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+  
+  // Document methods
   comparePassword(candidatePassword: string): Promise<boolean>;
   checkProfileCompletion(): boolean;
 }
