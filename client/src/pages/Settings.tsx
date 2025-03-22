@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, ShieldAlert } from "lucide-react";
+import Layout from "@/components/Layout";
 import { ProfileUpdateInput } from "../../../shared/schema";
 
 export default function Settings() {
@@ -136,111 +137,115 @@ export default function Settings() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-80">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">Loading settings...</span>
-      </div>
+      <Layout>
+        <div className="flex items-center justify-center h-80">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2">Loading settings...</span>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <h1 className="text-3xl font-bold">Settings</h1>
-      
-      <form onSubmit={handleSubmit}>
-        <Card className="mb-6">
+    <Layout>
+      <div className="container mx-auto py-6 space-y-6">
+        <h1 className="text-3xl font-bold">Settings</h1>
+        
+        <form onSubmit={handleSubmit}>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <ShieldAlert className="mr-2 h-5 w-5" />
+                Privacy Settings
+              </CardTitle>
+              <CardDescription>
+                Control what information is visible to other users
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="hideEmail">Hide Email Address</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Keep your email address private from other users
+                    </p>
+                  </div>
+                  <Switch
+                    id="hideEmail"
+                    checked={formData.hideEmail}
+                    onCheckedChange={(checked) => handleSwitchChange("hideEmail", checked)}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="hidePhone">Hide Phone Number</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Keep your phone number private from other users
+                    </p>
+                  </div>
+                  <Switch
+                    id="hidePhone"
+                    checked={formData.hidePhone}
+                    onCheckedChange={(checked) => handleSwitchChange("hidePhone", checked)}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="hideDob">Hide Date of Birth</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Keep your date of birth private from other users
+                    </p>
+                  </div>
+                  <Switch
+                    id="hideDob"
+                    checked={formData.hideDob}
+                    onCheckedChange={(checked) => handleSwitchChange("hideDob", checked)}
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-end pt-6">
+              <Button 
+                type="submit" 
+                size="lg" 
+                disabled={isSubmitting || updatePrivacySettings.isPending}
+              >
+                {(isSubmitting || updatePrivacySettings.isPending) && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Save Privacy Settings
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
+        
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <ShieldAlert className="mr-2 h-5 w-5" />
-              Privacy Settings
-            </CardTitle>
+            <CardTitle>Account Security</CardTitle>
             <CardDescription>
-              Control what information is visible to other users
+              Manage your account security settings
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="hideEmail">Hide Email Address</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Keep your email address private from other users
-                  </p>
-                </div>
-                <Switch
-                  id="hideEmail"
-                  checked={formData.hideEmail}
-                  onCheckedChange={(checked) => handleSwitchChange("hideEmail", checked)}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="hidePhone">Hide Phone Number</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Keep your phone number private from other users
-                  </p>
-                </div>
-                <Switch
-                  id="hidePhone"
-                  checked={formData.hidePhone}
-                  onCheckedChange={(checked) => handleSwitchChange("hidePhone", checked)}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="hideDob">Hide Date of Birth</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Keep your date of birth private from other users
-                  </p>
-                </div>
-                <Switch
-                  id="hideDob"
-                  checked={formData.hideDob}
-                  onCheckedChange={(checked) => handleSwitchChange("hideDob", checked)}
-                />
-              </div>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">Change Password</h3>
+              <p className="text-sm text-muted-foreground">
+                This feature will be available in a future update
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
+              <p className="text-sm text-muted-foreground">
+                This feature will be available in a future update
+              </p>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-end pt-6">
-            <Button 
-              type="submit" 
-              size="lg" 
-              disabled={isSubmitting || updatePrivacySettings.isPending}
-            >
-              {(isSubmitting || updatePrivacySettings.isPending) && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Save Privacy Settings
-            </Button>
-          </CardFooter>
         </Card>
-      </form>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Account Security</CardTitle>
-          <CardDescription>
-            Manage your account security settings
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Change Password</h3>
-            <p className="text-sm text-muted-foreground">
-              This feature will be available in a future update
-            </p>
-          </div>
-          
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
-            <p className="text-sm text-muted-foreground">
-              This feature will be available in a future update
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+      </div>
+    </Layout>
   );
 }
