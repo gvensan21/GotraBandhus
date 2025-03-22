@@ -69,7 +69,7 @@ export default function Profile() {
   });
 
   // Fetch user profile data
-  const { data: profileData, isLoading } = useQuery({
+  const { data: profileData, isLoading } = useQuery<{ profile: ProfileUpdateInput }>({
     queryKey: ['/api/user/profile'],
     staleTime: 30000,
     retry: 1

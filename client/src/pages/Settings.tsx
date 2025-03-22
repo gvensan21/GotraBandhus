@@ -30,7 +30,7 @@ export default function Settings() {
   });
 
   // Fetch user profile data
-  const { data: profileData, isLoading } = useQuery({
+  const { data: profileData, isLoading } = useQuery<{ profile: ProfileUpdateInput }>({
     queryKey: ['/api/user/profile'],
     staleTime: 30000,
     retry: 1
@@ -84,18 +84,48 @@ export default function Settings() {
     setIsSubmitting(true);
     
     try {
-      // Make sure we're only sending the privacy settings
-      const privacyData = {
+      // We need the current profile data to update the privacy settings
+      if (!profileData?.profile) {
+        toast({
+          title: "Error",
+          description: "Could not retrieve your profile data. Please try again later.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Create a copy of the profile with updated privacy settings
+      const profile = profileData.profile;
+      
+      const updateData: ProfileUpdateInput = {
+        // Required fields with defaults in case they're somehow undefined
+        firstName: profile.firstName || "",
+        lastName: profile.lastName || "",
+        nickname: profile.nickname || "",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        gender: profile.gender || "male",
+        currentCity: profile.currentCity || "",
+        currentState: profile.currentState || "",
+        currentCountry: profile.currentCountry || "",
+        gotra: profile.gotra || "",
+        pravara: profile.pravara || "",
+        primaryLanguage: profile.primaryLanguage || "",
+        community: profile.community || "",
+        // Update privacy settings
         hideEmail: formData.hideEmail,
         hidePhone: formData.hidePhone,
         hideDob: formData.hideDob,
-      };
-      
-      // We need to maintain the existing user data - add the minimum required fields
-      // that would typically be present in the existing user profile
-      const updateData: ProfileUpdateInput = {
-        ...profileData?.profile,
-        ...privacyData
+        // Include optional fields if they exist
+        dateOfBirth: profile.dateOfBirth,
+        birthCity: profile.birthCity,
+        birthState: profile.birthState,
+        birthCountry: profile.birthCountry,
+        occupation: profile.occupation,
+        company: profile.company,
+        industry: profile.industry,
+        secondaryLanguage: profile.secondaryLanguage,
+        bio: profile.bio
       };
       
       await updatePrivacySettings.mutateAsync(updateData);
