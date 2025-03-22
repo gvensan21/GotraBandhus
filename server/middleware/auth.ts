@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { storage } from '../storage';
 
-// Extended Express Request interface to include userId
+// Extend the Express Request interface to include userId
 export interface AuthRequest extends Request {
   userId?: string;
 }
 
-// Authentication middleware
+// Middleware to authenticate requests using JWT
 export const authenticate = async (
   req: AuthRequest,
   res: Response,
@@ -15,53 +15,60 @@ export const authenticate = async (
   try {
     // Get token from Authorization header
     const authHeader = req.headers.authorization;
+    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized - No token provided' });
+      return res.status(401).json({ error: 'Authentication required' });
     }
     
-    // Extract token
+    // Extract token without "Bearer " prefix
     const token = authHeader.split(' ')[1];
     
     // Verify token
     const userId = storage.verifyToken(token);
+    
     if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized - Invalid token' });
+      return res.status(401).json({ error: 'Invalid or expired token' });
     }
     
-    // Attach userId to request for use in route handlers
+    // Add userId to request for use in route handlers
     req.userId = userId;
+    
+    // Continue to next middleware or route handler
     next();
   } catch (error) {
     console.error('Authentication error:', error);
-    res.status(500).json({ error: 'Server error during authentication' });
+    res.status(500).json({ error: 'Authentication failed' });
   }
 };
 
-// Profile completion check middleware
+// Middleware to check if user profile is complete
 export const checkProfileComplete = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    if (!req.userId) {
-      return res.status(401).json({ error: 'Unauthorized - Authentication required' });
+    const userId = req.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
     }
     
-    // Check if user's profile is complete
-    const isProfileComplete = await storage.checkProfileCompletion(req.userId);
+    // Check if profile is complete
+    const isComplete = await storage.checkProfileCompletion(userId);
     
-    if (!isProfileComplete) {
+    if (!isComplete) {
       return res.status(403).json({ 
-        error: 'Profile incomplete',
+        error: 'Profile incomplete', 
         message: 'Please complete your profile before accessing this resource',
         redirectTo: '/profile'
       });
     }
     
+    // Profile is complete, continue
     next();
   } catch (error) {
     console.error('Profile check error:', error);
-    res.status(500).json({ error: 'Server error during profile check' });
+    res.status(500).json({ error: 'Error checking profile completion' });
   }
 };

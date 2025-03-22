@@ -18,7 +18,8 @@ export const register = async (req: Request, res: Response) => {
     const newUser = await storage.createUser(validatedData);
     
     // Generate token
-    const token = storage.generateToken(newUser._id);
+    const userId = (newUser as any)._id || newUser.id;
+    const token = storage.generateToken(userId);
     
     // Return user data and token
     res.status(201).json({ 

@@ -7,12 +7,15 @@ import {
 import { UserModel, UserDocument } from "./models/User";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
+import { log } from './vite';
+import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_only_for_development';
 
-// Storage interface for MongoDB
+// Storage interface
 export interface IStorage {
   // User methods
   getUserById(id: string): Promise<User | null>;
@@ -29,6 +32,7 @@ export interface IStorage {
   checkProfileCompletion(userId: string): Promise<boolean>;
 }
 
+// MongoDB Storage Implementation
 export class MongoStorage implements IStorage {
   // User methods
   async getUserById(id: string): Promise<User | null> {
@@ -65,8 +69,12 @@ export class MongoStorage implements IStorage {
       
       // Return user object without password
       const userObj = savedUser.toObject();
-      delete userObj.password;
-      return userObj;
+      const result = { ...userObj };
+      // Use optional chaining to avoid TypeScript error
+      if (result.password) {
+        delete result.password;
+      }
+      return result;
     } catch (error) {
       console.error('Error creating user:', error);
       throw error;
@@ -91,8 +99,11 @@ export class MongoStorage implements IStorage {
       
       // Return user object without password
       const userObj = updatedUser.toObject();
-      delete userObj.password;
-      return userObj;
+      const result = { ...userObj };
+      if (result.password) {
+        delete result.password;
+      }
+      return result;
     } catch (error) {
       console.error('Error updating user profile:', error);
       return null;
@@ -114,9 +125,12 @@ export class MongoStorage implements IStorage {
       
       // Return user data and token
       const userObj = user.toObject();
-      delete userObj.password;
+      const result = { ...userObj };
+      if (result.password) {
+        delete result.password;
+      }
       
-      return { user: userObj, token };
+      return { user: result, token };
     } catch (error) {
       console.error('Error during login:', error);
       return null;
@@ -150,4 +164,245 @@ export class MongoStorage implements IStorage {
   }
 }
 
-export const storage = new MongoStorage();
+// Define a type for our in-memory user that includes _id and sets all fields as required
+type InMemoryUser = {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  nickname: string;
+  email: string;
+  password: string;
+  phone: string;
+  gender: "male" | "female" | "other";
+  dateOfBirth?: string; 
+  birthCity?: string;
+  birthState?: string;
+  birthCountry?: string;
+  currentCity: string;
+  currentState: string;
+  currentCountry: string;
+  gotra: string;
+  pravara: string;
+  occupation?: string;
+  company?: string;
+  industry?: string;
+  primaryLanguage: string;
+  secondaryLanguage?: string;
+  community: string;
+  hideEmail: boolean;
+  hidePhone: boolean;
+  hideDob: boolean;
+  bio?: string;
+  profileCompleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// In-Memory Storage Implementation (Fallback)
+export class MemStorage implements IStorage {
+  private users: Map<string, InMemoryUser> = new Map();
+  private emailToId: Map<string, string> = new Map();
+  
+  constructor() {
+    log('Using in-memory storage as fallback', 'database');
+  }
+  
+  // Helper method to check if a profile is complete
+  private isProfileComplete(user: InMemoryUser): boolean {
+    // Required fields for profile completion
+    const requiredFields = [
+      'firstName', 'lastName', 'nickname', 'email', 'phone', 'gender',
+      'currentCity', 'currentState', 'currentCountry',
+      'gotra', 'pravara', 'community', 'primaryLanguage'
+    ];
+    
+    // Check if all required fields have values
+    return requiredFields.every(field => {
+      return user[field as keyof InMemoryUser] !== undefined && 
+             user[field as keyof InMemoryUser] !== null && 
+             user[field as keyof InMemoryUser] !== '';
+    });
+  }
+  
+  // User methods
+  async getUserById(id: string): Promise<User | null> {
+    const user = this.users.get(id);
+    if (!user) return null;
+    
+    // Return user without password
+    const userWithoutPassword = { ...user };
+    delete userWithoutPassword.password;
+    
+    return userWithoutPassword;
+  }
+  
+  async getUserByEmail(email: string): Promise<UserDocument | null> {
+    const userId = this.emailToId.get(email.toLowerCase());
+    if (!userId) return null;
+    
+    const user = this.users.get(userId);
+    if (!user) return null;
+    
+    // Create a UserDocument-like object with necessary methods
+    const userDoc = {
+      ...user,
+      id: user._id,
+      comparePassword: async (candidatePassword: string): Promise<boolean> => {
+        try {
+          return await bcrypt.compare(candidatePassword, user.password);
+        } catch (error) {
+          console.error('Password comparison error:', error);
+          return false;
+        }
+      },
+      checkProfileCompletion: (): boolean => {
+        return this.isProfileComplete(user);
+      },
+      toObject: () => {
+        const obj = { ...user };
+        return obj;
+      }
+    } as unknown as UserDocument;
+    
+    return userDoc;
+  }
+  
+  async createUser(userData: RegisterInput): Promise<User> {
+    try {
+      // Generate ID
+      const userId = uuidv4();
+      
+      // Hash password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(userData.password, salt);
+      
+      // Create a minimal user with required fields for registration
+      const newUser: InMemoryUser = {
+        _id: userId,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        nickname: userData.nickname,
+        email: userData.email,
+        password: hashedPassword,
+        phone: userData.phone,
+        gender: 'other', // Default value
+        currentCity: '',
+        currentState: '',
+        currentCountry: '',
+        gotra: '',
+        pravara: '',
+        community: '',
+        primaryLanguage: '',
+        // Default privacy settings
+        hideEmail: false,
+        hidePhone: false,
+        hideDob: false,
+        profileCompleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      // Store user
+      this.users.set(userId, newUser);
+      this.emailToId.set(userData.email.toLowerCase(), userId);
+      
+      // Return user without password
+      const userToReturn = { ...newUser };
+      delete userToReturn.password;
+      
+      return userToReturn;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
+  }
+  
+  async updateUserProfile(userId: string, profileData: ProfileUpdateInput): Promise<User | null> {
+    // Get existing user
+    const existingUser = this.users.get(userId);
+    if (!existingUser) return null;
+    
+    // Update user with new profile data
+    const updatedUser: InMemoryUser = {
+      ...existingUser,
+      ...profileData,
+      updatedAt: new Date()
+    };
+    
+    // Check profile completion
+    updatedUser.profileCompleted = this.isProfileComplete(updatedUser);
+    
+    // Store updated user
+    this.users.set(userId, updatedUser);
+    
+    // Return user without password
+    const userToReturn = { ...updatedUser };
+    delete userToReturn.password;
+    
+    return userToReturn;
+  }
+  
+  async login(loginData: LoginInput): Promise<{ user: User; token: string } | null> {
+    try {
+      // Get user by email
+      const userDoc = await this.getUserByEmail(loginData.email);
+      if (!userDoc) return null;
+      
+      // Check password
+      const isPasswordValid = await userDoc.comparePassword(loginData.password);
+      if (!isPasswordValid) return null;
+      
+      // Get user without password
+      const user = await this.getUserById((userDoc as any)._id);
+      if (!user) return null;
+      
+      // Generate token
+      const token = this.generateToken((userDoc as any)._id);
+      
+      return { user, token };
+    } catch (error) {
+      console.error('Login error:', error);
+      return null;
+    }
+  }
+  
+  // JWT methods
+  generateToken(userId: string): string {
+    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
+  }
+  
+  verifyToken(token: string): string | null {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      return decoded.userId;
+    } catch (error) {
+      console.error('Error verifying token:', error);
+      return null;
+    }
+  }
+  
+  // Profile methods
+  async checkProfileCompletion(userId: string): Promise<boolean> {
+    const user = this.users.get(userId);
+    return user ? user.profileCompleted : false;
+  }
+}
+
+// Determine which storage implementation to use
+let storageImplementation: IStorage;
+
+try {
+  // Try to check MongoDB connection (this won't actually connect yet)
+  if (process.env.MONGO_URI) {
+    log('Using MongoDB storage', 'database');
+    storageImplementation = new MongoStorage();
+  } else {
+    log('MongoDB URI not found, falling back to in-memory storage', 'database');
+    storageImplementation = new MemStorage();
+  }
+} catch (error) {
+  log(`Error initializing MongoDB storage, falling back to in-memory: ${error}`, 'database');
+  storageImplementation = new MemStorage();
+}
+
+export const storage = storageImplementation;
