@@ -2,12 +2,15 @@ import mongoose from 'mongoose';
 import { log } from '../vite';
 
 // MongoDB connection options
-const options = {
+const options: mongoose.ConnectOptions = {
   autoIndex: true, // Build indexes
   maxPoolSize: 10, // Maintain up to 10 socket connections
-  serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-  family: 4 // Use IPv4, skip trying IPv6
+  serverSelectionTimeoutMS: 10000, // Keep trying to send operations for 10 seconds
+  socketTimeoutMS: 60000, // Close sockets after 60 seconds of inactivity
+  family: 4, // Use IPv4, skip trying IPv6
+  retryWrites: true,
+  // Use any assertion to avoid TypeScript error with w:'majority'
+  w: 'majority' as any
 };
 
 // Track connection status
@@ -30,7 +33,7 @@ export async function connectToDatabase() {
     
     // Set timeout for connection
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Connection timeout')), 5000);
+      setTimeout(() => reject(new Error('Connection timeout')), 10000);
     });
     
     // Race connection against timeout
@@ -63,7 +66,24 @@ export async function connectToDatabase() {
     
     return true;
   } catch (error) {
-    log(`Error connecting to MongoDB: ${error}`, 'database');
+    // Log detailed error information
+    if (error instanceof Error) {
+      log(`Error connecting to MongoDB: ${error.message}`, 'database');
+      if (error.stack) {
+        log(`Error stack: ${error.stack}`, 'database');
+      }
+    } else {
+      log(`Error connecting to MongoDB: ${error}`, 'database');
+    }
+    
+    // Check if MONGO_URI is valid
+    const mongoUri = process.env.MONGO_URI;
+    if (mongoUri) {
+      if (!mongoUri.startsWith('mongodb://') && !mongoUri.startsWith('mongodb+srv://')) {
+        log('Invalid MongoDB URI format. URI should start with mongodb:// or mongodb+srv://', 'database');
+      }
+    }
+    
     log('Using in-memory storage as fallback', 'database');
     return false;
   }
