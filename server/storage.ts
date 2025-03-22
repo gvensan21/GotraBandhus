@@ -70,11 +70,9 @@ export class MongoStorage implements IStorage {
       // Return user object without password
       const userObj = savedUser.toObject();
       const result = { ...userObj };
-      // Use optional chaining to avoid TypeScript error
-      if (result.password) {
-        delete result.password;
-      }
-      return result;
+      // Create a type-safe way to remove the password
+      const { password, ...resultWithoutPassword } = result;
+      return resultWithoutPassword as User;
     } catch (error) {
       console.error('Error creating user:', error);
       throw error;
