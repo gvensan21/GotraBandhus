@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+import Logo from "./Logo";
 
 interface SidebarProps {
   open: boolean;
@@ -59,12 +60,7 @@ export default function Sidebar({ open }: SidebarProps) {
       open ? "w-64" : "w-16"
     )}>
       <div className="p-4 border-b border-gray-700">
-        <h2 className={cn(
-          "font-bold",
-          open ? "text-xl" : "text-center text-lg"
-        )}>
-          {open ? "GotraBandhus" : "GB"}
-        </h2>
+        <Logo variant={open ? "full" : "icon"} size={open ? "md" : "sm"} className="mx-auto" />
       </div>
       <nav className="mt-4">
         <ul className="space-y-1">

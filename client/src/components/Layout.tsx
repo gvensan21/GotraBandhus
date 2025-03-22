@@ -12,7 +12,8 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const { isAuthenticated, logout } = useAuth();
+  const auth = useAuth();
+  const { isAuthenticated, logout, user } = auth;
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -59,9 +60,9 @@ export default function Layout({ children }: LayoutProps) {
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                   >
                     <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
-                      {useAuth().user?.name.charAt(0).toUpperCase()}
+                      {user?.name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="ml-2 text-text-medium">{useAuth().user?.name}</span>
+                    <span className="ml-2 text-text-medium">{user?.name}</span>
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
                       width="16" 
