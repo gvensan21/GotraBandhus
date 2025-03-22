@@ -5,6 +5,7 @@ import FamilyTree from "@/pages/FamilyTree";
 import FindBandhu from "@/pages/FindBandhu";
 import ConnectFamilies from "@/pages/ConnectFamilies";
 import Profile from "@/pages/Profile";
+import Settings from "@/pages/Settings";
 import NotFound from "@/pages/not-found";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -38,6 +39,7 @@ export default function Routes() {
       <Route path="/find-bandhu" component={FindBandhu} />
       <Route path="/connect-families" component={ConnectFamilies} />
       <Route path="/profile" component={Profile} />
+      <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
   );
