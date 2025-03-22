@@ -76,10 +76,14 @@ export class MongoStorage implements IStorage {
       
       // Return user object without password
       const userObj = savedUser.toObject();
-      const result = { ...userObj };
+      const result = { 
+        ...userObj,
+        _id: userObj._id?.toString() // Ensure _id is a string
+      };
+      
       // Create a type-safe way to remove the password
       const { password, ...resultWithoutPassword } = result;
-      return resultWithoutPassword as User;
+      return resultWithoutPassword as unknown as User;
     } catch (error) {
       console.error('Error creating user:', error);
       throw error;
@@ -104,8 +108,15 @@ export class MongoStorage implements IStorage {
       
       // Return user object without password
       const userObj = updatedUser.toObject();
-      const { password, ...resultWithoutPassword } = userObj;
-      return resultWithoutPassword as User;
+      
+      // Ensure _id is a string
+      const result = {
+        ...userObj,
+        _id: userObj._id?.toString()
+      };
+      
+      const { password, ...resultWithoutPassword } = result;
+      return resultWithoutPassword as unknown as User;
     } catch (error) {
       console.error('Error updating user profile:', error);
       return null;
@@ -129,9 +140,16 @@ export class MongoStorage implements IStorage {
       
       // Return user data and token
       const userObj = user.toObject();
-      const { password, ...userWithoutPassword } = userObj;
       
-      return { user: userWithoutPassword as User, token };
+      // Ensure _id is a string
+      const result = {
+        ...userObj,
+        _id: userObj._id?.toString()
+      };
+      
+      const { password, ...userWithoutPassword } = result;
+      
+      return { user: userWithoutPassword as unknown as User, token };
     } catch (error) {
       console.error('Error during login:', error);
       return null;
@@ -395,7 +413,7 @@ let storageImplementation: IStorage;
 
 try {
   // Try to check MongoDB connection (this won't actually connect yet)
-  if (process.env.MONGO_URI) {
+  if (process.env.MONGO_URI || process.env.MONGODB_URI) {
     log('Using MongoDB storage', 'database');
     storageImplementation = new MongoStorage();
   } else {

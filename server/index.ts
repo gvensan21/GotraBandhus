@@ -44,15 +44,19 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
-    // Try to connect to MongoDB database, but continue with in-memory if it fails
-    try {
-      await connectToDatabase();
-    } catch (dbError) {
-      log(`MongoDB connection failed, continuing with in-memory storage: ${dbError}`, 'database');
-    }
-    
-    // Register API routes
+    // Register API routes first
     const server = await registerRoutes(app);
+    
+    // Try to connect to MongoDB database in background, don't block server startup
+    connectToDatabase().then(connected => {
+      if (connected) {
+        log('MongoDB connected successfully', 'database');
+      } else {
+        log('Using in-memory storage (MongoDB connection not established)', 'database');
+      }
+    }).catch(dbError => {
+      log(`MongoDB connection failed, continuing with in-memory storage: ${dbError}`, 'database');
+    });
 
     // Error handling middleware
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
