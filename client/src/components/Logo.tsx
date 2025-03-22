@@ -32,7 +32,7 @@ export default function Logo({ size = "md", variant = "full", className }: LogoP
       </div>
       {variant === "full" && (
         <div className="ml-2 flex flex-col">
-          <span className={cn("font-bold leading-tight", sizes[size].text)}>
+          <span className={cn("font-bold leading-tight text-foreground", sizes[size].text)}>
             Gotra<span className="text-secondary">Bandhus</span>
           </span>
         </div>

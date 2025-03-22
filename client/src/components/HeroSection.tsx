@@ -22,7 +22,7 @@ export default function HeroSection() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-primary mb-4">Discover Your Family History</h1>
-            <p className="text-lg text-gray-600 mb-8">GotraBandhus helps you build, visualize, and share your family tree. Create connections across generations and preserve your family's unique story.</p>
+            <p className="text-lg text-muted-foreground mb-8">GotraBandhus helps you build, visualize, and share your family tree. Create connections across generations and preserve your family's unique story.</p>
             <div className="flex flex-wrap gap-4">
               <Button size="lg" onClick={handleGetStarted}>Get Started</Button>
               <Button size="lg" variant="outline" onClick={handleSignIn}>Sign In</Button>
