@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import AuthModal from "./AuthModal";
+import ThemeToggle from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
 
 export default function Navbar() {

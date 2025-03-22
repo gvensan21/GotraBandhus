@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import Sidebar from "./Sidebar";
+import ThemeToggle from "./ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
@@ -54,6 +55,7 @@ export default function Layout({ children }: LayoutProps) {
                 </svg>
               </button>
               <div className="flex items-center space-x-4">
+                <ThemeToggle />
                 <div className="relative" ref={menuRef}>
                   <button 
                     className="flex items-center space-x-2 rounded-md hover:bg-gray-100 p-2"
