@@ -229,11 +229,10 @@ export class MemStorage implements IStorage {
     const user = this.users.get(id);
     if (!user) return null;
     
-    // Return user without password
-    const userWithoutPassword = { ...user };
-    delete userWithoutPassword.password;
+    // Return user without password by creating a new object without it
+    const { password, ...userWithoutPassword } = user;
     
-    return userWithoutPassword;
+    return userWithoutPassword as User;
   }
   
   async getUserByEmail(email: string): Promise<UserDocument | null> {
@@ -307,10 +306,9 @@ export class MemStorage implements IStorage {
       this.emailToId.set(userData.email.toLowerCase(), userId);
       
       // Return user without password
-      const userToReturn = { ...newUser };
-      delete userToReturn.password;
+      const { password, ...userToReturn } = newUser;
       
-      return userToReturn;
+      return userToReturn as User;
     } catch (error) {
       console.error('Error creating user:', error);
       throw error;
@@ -336,10 +334,9 @@ export class MemStorage implements IStorage {
     this.users.set(userId, updatedUser);
     
     // Return user without password
-    const userToReturn = { ...updatedUser };
-    delete userToReturn.password;
+    const { password, ...userToReturn } = updatedUser;
     
-    return userToReturn;
+    return userToReturn as User;
   }
   
   async login(loginData: LoginInput): Promise<{ user: User; token: string } | null> {
@@ -352,12 +349,15 @@ export class MemStorage implements IStorage {
       const isPasswordValid = await userDoc.comparePassword(loginData.password);
       if (!isPasswordValid) return null;
       
+      // Get the user ID safely
+      const userId = userDoc._id || '';
+      
       // Get user without password
-      const user = await this.getUserById((userDoc as any)._id);
+      const user = await this.getUserById(userId);
       if (!user) return null;
       
       // Generate token
-      const token = this.generateToken((userDoc as any)._id);
+      const token = this.generateToken(userId);
       
       return { user, token };
     } catch (error) {

@@ -17,8 +17,8 @@ export const register = async (req: Request, res: Response) => {
     // Create user
     const newUser = await storage.createUser(validatedData);
     
-    // Generate token
-    const userId = (newUser as any)._id || newUser.id;
+    // Generate token from user ID (could be _id from MongoDB or id from other storage)
+    const userId = newUser._id || newUser.id || '';
     const token = storage.generateToken(userId);
     
     // Return user data and token

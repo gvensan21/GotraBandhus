@@ -58,7 +58,11 @@ export const profileUpdateSchema = userSchema.omit({
 });
 
 // Types
-export type User = z.infer<typeof userSchema>;
+export type User = z.infer<typeof userSchema> & {
+  // Include MongoDB _id or regular id field
+  _id?: string;
+  id?: string;
+};
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
