@@ -43,7 +43,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex flex-1">
           <Sidebar open={sidebarOpen} />
           <div className="flex-1 flex flex-col">
-            <div className="bg-white shadow-sm p-4 flex justify-between items-center">
+            <div className="bg-background shadow-sm p-4 flex justify-between items-center">
               <button 
                 onClick={toggleSidebar}
                 className="text-text-medium hover:text-secondary p-2"
@@ -58,13 +58,13 @@ export default function Layout({ children }: LayoutProps) {
                 <ThemeToggle />
                 <div className="relative" ref={menuRef}>
                   <button 
-                    className="flex items-center space-x-2 rounded-md hover:bg-gray-100 p-2"
+                    className="flex items-center space-x-2 rounded-md hover:bg-muted p-2"
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                   >
-                    <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
+                    <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                       {user?.name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="ml-2 text-text-medium">{user?.name}</span>
+                    <span className="ml-2 text-foreground">{user?.name}</span>
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
                       width="16" 
@@ -85,20 +85,20 @@ export default function Layout({ children }: LayoutProps) {
                   </button>
                   
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md overflow-hidden z-50 border">
+                    <div className="absolute right-0 mt-2 w-48 bg-card shadow-lg rounded-md overflow-hidden z-50 border">
                       <Link href="/profile">
-                        <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                        <div className="block px-4 py-2 text-sm text-foreground hover:bg-muted cursor-pointer">
                           Profile
                         </div>
                       </Link>
                       <Link href="/settings">
-                        <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                        <div className="block px-4 py-2 text-sm text-foreground hover:bg-muted cursor-pointer">
                           Settings
                         </div>
                       </Link>
                       <button 
                         onClick={logout}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted"
                       >
                         Logout
                       </button>
