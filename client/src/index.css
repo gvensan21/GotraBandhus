@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --sidebar-border: rgba(255, 255, 255, 0.2);
+  }
+
+  .dark {
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+  }
+
   * {
     @apply border-border;
   }

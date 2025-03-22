@@ -79,7 +79,7 @@ export default function Sidebar({ open }: SidebarProps) {
       "bg-primary text-white h-screen flex-shrink-0 transition-all duration-300 ease-in-out overflow-y-auto",
       open ? "w-64" : "w-16"
     )}>
-      <div className="p-4 border-b border-gray-700">
+      <div className="p-4 border-b border-sidebar-border">
         <Logo variant={open ? "full" : "icon"} size={open ? "md" : "sm"} className="mx-auto" />
       </div>
       <nav className="mt-4">
@@ -90,8 +90,8 @@ export default function Sidebar({ open }: SidebarProps) {
                 <a className={cn(
                   "flex items-center px-4 py-3",
                   location === item.path 
-                    ? "text-primary-foreground bg-white border-l-4 border-secondary" 
-                    : "text-gray-300 hover:bg-secondary hover:bg-opacity-10 hover:border-l-4 hover:border-secondary"
+                    ? "text-primary-foreground bg-white/90 dark:bg-white/10 border-l-4 border-secondary" 
+                    : "text-white/80 hover:bg-white/10 hover:border-l-4 hover:border-secondary"
                 )}>
                   <span className="w-6">{item.icon}</span>
                   <span className={cn("ml-2", !open && "hidden")}>{item.label}</span>

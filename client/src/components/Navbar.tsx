@@ -51,7 +51,7 @@ export default function Navbar() {
             <div className="flex items-center md:hidden">
               <button
                 onClick={toggleMobileMenu}
-                className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
+                className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none"
               >
                 <span className="sr-only">Open main menu</span>
                 <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -64,11 +64,11 @@ export default function Navbar() {
         <div className={`${mobileMenuOpen ? 'block' : 'hidden'} md:hidden bg-background border-t border-border`}>
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link href="/">
-              <span className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-50 cursor-pointer">Home</span>
+              <span className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted cursor-pointer">Home</span>
             </Link>
-            <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-50">Features</a>
-            <a href="#about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-50">About</a>
-            <a href="#contact" className="block px-3 py-2 rounded-md text-base font-medium text-gray-900 hover:bg-gray-50">Contact</a>
+            <a href="#features" className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted">Features</a>
+            <a href="#about" className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted">About</a>
+            <a href="#contact" className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted">Contact</a>
           </div>
         </div>
       </nav>
