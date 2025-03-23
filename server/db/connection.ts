@@ -15,12 +15,15 @@ const getConnectionOptions = (uri: string): mongoose.ConnectOptions => {
     w: 'majority' as any
   };
 
-  // For localhost connections, disable SSL
+  // For localhost connections, disable SSL/TLS
   if (uri.includes('localhost') || uri.includes('127.0.0.1')) {
     return {
       ...options,
       ssl: false,
       tls: false,
+      tlsAllowInvalidCertificates: true,
+      tlsAllowInvalidHostnames: true,
+      directConnection: true,
     };
   }
 
