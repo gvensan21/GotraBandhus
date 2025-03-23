@@ -8,31 +8,32 @@ export interface AuthRequest extends Request {
 
 // Middleware to authenticate requests using JWT
 export const authenticate = async (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  console.log('Auth middleware - headers:', req.headers);
   try {
     // Get token from Authorization header
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Authentication required' });
     }
-    
+
     // Extract token without "Bearer " prefix
     const token = authHeader.split(' ')[1];
-    
+
     // Verify token
     const userId = storage.verifyToken(token);
-    
+
     if (!userId) {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
-    
+
     // Add userId to request for use in route handlers
     req.userId = userId;
-    
+
     // Continue to next middleware or route handler
     next();
   } catch (error) {
@@ -49,14 +50,14 @@ export const checkProfileComplete = async (
 ) => {
   try {
     const userId = req.userId;
-    
+
     if (!userId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
-    
+
     // Check if profile is complete
     const isComplete = await storage.checkProfileCompletion(userId);
-    
+
     if (!isComplete) {
       return res.status(403).json({ 
         error: 'Profile incomplete', 
@@ -64,7 +65,7 @@ export const checkProfileComplete = async (
         redirectTo: '/profile'
       });
     }
-    
+
     // Profile is complete, continue
     next();
   } catch (error) {
