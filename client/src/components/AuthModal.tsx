@@ -22,7 +22,8 @@ const registerSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),
   lastName: z.string().min(1, { message: "Last name is required" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }), // Matching backend requirement
+  phone: z.string().default(""), // Required by the backend schema
   confirmPassword: z.string().min(1, { message: "Please confirm your password" }),
   termsAgreement: z.boolean().refine(val => val === true, { message: "You must accept the terms" }),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -79,7 +80,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
   };
 
   const onRegisterSubmit = async (data: RegisterFormValues) => {
-    const success = await registerUser(data.firstName, data.lastName, data.email, data.password);
+    // Pass phone data - it's required by the backend schema
+    const success = await registerUser(
+      data.firstName, 
+      data.lastName, 
+      data.email, 
+      data.password
+    );
     if (success) {
       onClose();
       registerForm.reset();
