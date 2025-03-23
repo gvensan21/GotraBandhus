@@ -86,7 +86,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
       data.firstName, 
       data.lastName, 
       data.email, 
-      data.password
+      data.password, 
+      data.phone // Pass the phone number
     );
     if (success) {
       onClose();

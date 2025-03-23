@@ -17,7 +17,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (firstName: string, lastName: string, email: string, password: string) => Promise<boolean>;
+  register: (firstName: string, lastName: string, email: string, password: string, phone?: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (firstName: string, lastName: string, email: string, password: string) => {
+  const register = async (firstName: string, lastName: string, email: string, password: string, phone: string = "") => {
     setIsLoading(true);
     try {
       const nickname = firstName.toLowerCase(); // Simple default nickname
@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         nickname,
         email, 
         password, 
-        phone: "" // Required field, can be updated in profile
+        phone // Use provided phone or default empty string
       });
       
       const data = await response.json();
