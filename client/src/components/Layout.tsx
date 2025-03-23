@@ -62,9 +62,9 @@ export default function Layout({ children }: LayoutProps) {
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                   >
                     <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                      {user?.name.charAt(0).toUpperCase()}
+                      {user?.firstName?.charAt(0).toUpperCase()}
                     </div>
-                    <span className="ml-2 text-foreground">{user?.name}</span>
+                    <span className="ml-2 text-foreground">{user?.firstName} {user?.lastName}</span>
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
                       width="16" 
