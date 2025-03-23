@@ -1,8 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { connectToDatabase } from "./db/connection";
 import dotenv from "dotenv";
+import { db } from "./db"; // Import the Drizzle DB connection
 
 // Load environment variables
 dotenv.config();
@@ -47,8 +47,8 @@ app.use((req, res, next) => {
     // Register API routes first
     const server = await registerRoutes(app);
     
-    // Skip MongoDB connection - using memory storage only
-    log('Using in-memory storage only (MongoDB connection disabled)', 'database');
+    // Log PostgreSQL connection
+    log('Using PostgreSQL database with Drizzle ORM', 'database');
 
     // Error handling middleware
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
