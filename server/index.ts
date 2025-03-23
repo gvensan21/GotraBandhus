@@ -47,16 +47,36 @@ app.use((req, res, next) => {
     // Register API routes first
     const server = await registerRoutes(app);
     
-    // Try to connect to MongoDB database in background, don't block server startup
-    connectToDatabase().then(connected => {
-      if (connected) {
-        log('MongoDB connected successfully', 'database');
-      } else {
-        log('Using in-memory storage (MongoDB connection not established)', 'database');
-      }
-    }).catch(dbError => {
-      log(`MongoDB connection failed, continuing with in-memory storage: ${dbError}`, 'database');
-    });
+    // Attempt to connect to MongoDB with improved error handling
+    // We don't await this to avoid blocking server startup, but use log messages to track progress
+    connectToDatabase(3, 5000)
+      .then(connected => {
+        if (connected) {
+          log('MongoDB connected and ready to use', 'database');
+        } else {
+          // We'll retry connection later
+          log('Initial MongoDB connection attempt unsuccessful, will retry automatically', 'database');
+          
+          // Set up a reconnection attempt in the background
+          setTimeout(() => {
+            log('Attempting MongoDB reconnection...', 'database');
+            connectToDatabase(3, 5000)
+              .then(reconnected => {
+                if (reconnected) {
+                  log('MongoDB reconnected successfully', 'database');
+                } else {
+                  log('MongoDB reconnection failed', 'database');
+                }
+              })
+              .catch(reconnectError => {
+                log(`MongoDB reconnection error: ${reconnectError}`, 'database');
+              });
+          }, 30000); // Wait 30 seconds before retry
+        }
+      })
+      .catch(dbError => {
+        log(`MongoDB connection error: ${dbError}`, 'database');
+      });
 
     // Error handling middleware
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

@@ -10,31 +10,43 @@ const getConnectionOptions = (uri: string): mongoose.ConnectOptions => {
     serverSelectionTimeoutMS: 10000, // Keep trying to send operations for 10 seconds
     socketTimeoutMS: 60000, // Close sockets after 60 seconds of inactivity
     family: 4, // Use IPv4, skip trying IPv6
-    retryWrites: true,
+    retryWrites: false,
     // Use any assertion to avoid TypeScript error with w:'majority'
     w: 'majority' as any
   };
 
-  // For localhost connections, disable SSL/TLS
-  if (uri.includes('localhost') || uri.includes('127.0.0.1')) {
+  // Determine if this is an SRV URI
+  const isSrvUri = uri.startsWith('mongodb+srv://');
+
+  // For all connections, disable SSL/TLS by default
+  // We'll always use these options to avoid SSL-related issues
+  const baseOptions = {
+    ...options,
+    ssl: false,
+    tls: false,
+    tlsAllowInvalidCertificates: true,
+    tlsAllowInvalidHostnames: true,
+    maxIdleTimeMS: 30000,
+    heartbeatFrequencyMS: 5000,
+    socketTimeoutMS: 45000
+  };
+  
+  // Only add directConnection for non-SRV URIs
+  if (!isSrvUri) {
     return {
-      ...options,
-      ssl: false,
-      tls: false,
-      tlsAllowInvalidCertificates: true,
-      tlsAllowInvalidHostnames: true,
-      directConnection: true,
+      ...baseOptions,
+      directConnection: true
     };
   }
-
-  return options;
+  
+  return baseOptions;
 };
 
 // Track connection status
 let isMongoConnected = false;
 
 // Connect to MongoDB database
-export async function connectToDatabase(retryAttempts = 2, retryInterval = 3000) {
+export async function connectToDatabase(retryAttempts = 3, retryInterval = 5000) {
   let lastError;
   
   // Attempt to connect with retries
@@ -64,9 +76,9 @@ export async function connectToDatabase(retryAttempts = 2, retryInterval = 3000)
       // Try to connect to MongoDB with timeout
       const connectPromise = mongoose.connect(mongoUri, connectionOptions);
       
-      // Set timeout for connection (shorter to avoid blocking startup)
+      // Set timeout for connection (longer to allow for slower connections)
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Connection timeout')), 5000);
+        setTimeout(() => reject(new Error('Connection timeout')), 15000);
       });
       
       // Race connection against timeout
