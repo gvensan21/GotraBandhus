@@ -13,7 +13,7 @@ export const users = pgTable("users", {
   nickname: varchar("nickname", { length: 100 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
-  phone: varchar("phone", { length: 50 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
   gender: genderEnum("gender").default("other"),
   dateOfBirth: varchar("date_of_birth", { length: 50 }),
   birthCity: varchar("birth_city", { length: 100 }),
@@ -89,8 +89,9 @@ export const registerSchema = userSchema.pick({
   nickname: true,
   email: true,
   password: true,
-  phone: true,
-});
+}).merge(z.object({
+  phone: z.string().optional(),
+}));
 
 // Profile update schema (excludes some fields that shouldn't be updated directly)
 export const profileUpdateSchema = userSchema.omit({
