@@ -62,6 +62,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
       lastName: "",
       email: "",
       password: "",
+      phone: "", // Added phone field with default empty string
       confirmPassword: "",
       termsAgreement: false,
     },
@@ -224,6 +225,20 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
                       <FormLabel>Email Address</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter your email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={registerForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your phone number" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
