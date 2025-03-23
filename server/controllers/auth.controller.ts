@@ -17,8 +17,8 @@ export const register = async (req: Request, res: Response) => {
     // Create user
     const newUser = await storage.createUser(validatedData);
     
-    // Generate token from user ID
-    const userId = newUser.id.toString();
+    // Generate token from user ID (handles both Postgres and MemDB implementations)
+    const userId = newUser.id ? newUser.id.toString() : (newUser as any)._id?.toString();
     const token = storage.generateToken(userId);
     
     // Return user data and token

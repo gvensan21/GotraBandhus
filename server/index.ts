@@ -46,9 +46,6 @@ app.use((req, res, next) => {
   try {
     // Register API routes first
     const server = await registerRoutes(app);
-    
-    // Log PostgreSQL connection
-    log('Using PostgreSQL database with Drizzle ORM', 'database');
 
     // Error handling middleware
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
