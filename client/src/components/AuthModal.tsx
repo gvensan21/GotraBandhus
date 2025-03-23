@@ -70,16 +70,16 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
     setActiveTab(initialMode);
   }, [initialMode]);
 
-  const onLoginSubmit = (data: LoginFormValues) => {
-    const success = login(data.email, data.password);
+  const onLoginSubmit = async (data: LoginFormValues) => {
+    const success = await login(data.email, data.password);
     if (success) {
       onClose();
       loginForm.reset();
     }
   };
 
-  const onRegisterSubmit = (data: RegisterFormValues) => {
-    const success = registerUser(data.firstName, data.lastName, data.email, data.password);
+  const onRegisterSubmit = async (data: RegisterFormValues) => {
+    const success = await registerUser(data.firstName, data.lastName, data.email, data.password);
     if (success) {
       onClose();
       registerForm.reset();
