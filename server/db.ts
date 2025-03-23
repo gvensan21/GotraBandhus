@@ -4,6 +4,7 @@ import ws from "ws";
 import * as schema from "@shared/schema";
 
 neonConfig.webSocketConstructor = ws;
+neonConfig.wsProxy = (host) => `ws://0.0.0.0:5000/v2`;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -11,5 +12,8 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  keepAlive: true
+});
 export const db = drizzle({ client: pool, schema });
