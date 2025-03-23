@@ -23,7 +23,7 @@ const registerSchema = z.object({
   lastName: z.string().min(1, { message: "Last name is required" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }), // Matching backend requirement
-  phone: z.string().default(""), // Required by the backend schema
+  phone: z.string().min(1, { message: "Phone number is required" }),
   confirmPassword: z.string().min(1, { message: "Please confirm your password" }),
   termsAgreement: z.boolean().refine(val => val === true, { message: "You must accept the terms" }),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -237,7 +237,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number (Optional)</FormLabel>
+                      <FormLabel>Phone Number</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter your phone number" {...field} />
                       </FormControl>
