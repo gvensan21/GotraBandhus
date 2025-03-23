@@ -2,15 +2,29 @@ import mongoose from 'mongoose';
 import { log } from '../vite';
 
 // MongoDB connection options
-const options: mongoose.ConnectOptions = {
-  autoIndex: true, // Build indexes
-  maxPoolSize: 10, // Maintain up to 10 socket connections
-  serverSelectionTimeoutMS: 10000, // Keep trying to send operations for 10 seconds
-  socketTimeoutMS: 60000, // Close sockets after 60 seconds of inactivity
-  family: 4, // Use IPv4, skip trying IPv6
-  retryWrites: true,
-  // Use any assertion to avoid TypeScript error with w:'majority'
-  w: 'majority' as any
+const getConnectionOptions = (uri: string): mongoose.ConnectOptions => {
+  // Default options for all connections
+  const options: mongoose.ConnectOptions = {
+    autoIndex: true, // Build indexes
+    maxPoolSize: 10, // Maintain up to 10 socket connections
+    serverSelectionTimeoutMS: 10000, // Keep trying to send operations for 10 seconds
+    socketTimeoutMS: 60000, // Close sockets after 60 seconds of inactivity
+    family: 4, // Use IPv4, skip trying IPv6
+    retryWrites: true,
+    // Use any assertion to avoid TypeScript error with w:'majority'
+    w: 'majority' as any
+  };
+
+  // For localhost connections, disable SSL
+  if (uri.includes('localhost') || uri.includes('127.0.0.1')) {
+    return {
+      ...options,
+      ssl: false,
+      tls: false,
+    };
+  }
+
+  return options;
 };
 
 // Track connection status
@@ -41,8 +55,11 @@ export async function connectToDatabase(retryAttempts = 2, retryInterval = 3000)
       // Log connection attempt
       log(`Connecting to MongoDB (attempt ${attempt}/${retryAttempts})...`, 'database');
       
+      // Get appropriate connection options based on URI
+      const connectionOptions = getConnectionOptions(mongoUri);
+      
       // Try to connect to MongoDB with timeout
-      const connectPromise = mongoose.connect(mongoUri, options);
+      const connectPromise = mongoose.connect(mongoUri, connectionOptions);
       
       // Set timeout for connection (shorter to avoid blocking startup)
       const timeoutPromise = new Promise((_, reject) => {
