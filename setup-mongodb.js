@@ -1,8 +1,8 @@
 // Script to create GotraBandhus database and initial collections
 import { MongoClient } from 'mongodb';
 
-// Connection URI (using 0.0.0.0 since that's what the MongoDB server is bound to)
-const uri = 'mongodb://0.0.0.0:27017/GotraBandhus';
+// Connection URI (using 127.0.0.1 which is what the MongoDB server is bound to)
+const uri = 'mongodb://127.0.0.1:27017/GotraBandhus';
 
 async function createDatabase() {
   const client = new MongoClient(uri);
