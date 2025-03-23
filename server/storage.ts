@@ -408,18 +408,11 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Always use MongoDB storage
+// Always use in-memory storage
 let storageImplementation: IStorage;
 
-try {
-  // Use MongoDB storage
-  log('Using MongoDB storage', 'database');
-  storageImplementation = new MongoStorage();
-} catch (error) {
-  // This is a catastrophic initialization error, not a connection error
-  log(`Error initializing MongoDB storage class: ${error}`, 'database');
-  // Still use MongoDB with another instance as we want MongoDB only
-  storageImplementation = new MongoStorage();
-}
+// Use in-memory storage only
+log('Using in-memory storage only', 'database');
+storageImplementation = new MemStorage();
 
 export const storage = storageImplementation;
