@@ -7,13 +7,16 @@ import {
   ProfileUpdateInput 
 } from "@shared/schema";
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import { log } from './vite';
 import { db } from './db';
 import { eq, and } from 'drizzle-orm';
 
-dotenv.config();
+import dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_only_for_development';
 

@@ -2,10 +2,10 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import dotenv from "dotenv";
-import { db } from "./db"; // Import the Drizzle DB connection
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 
 const app = express();
 app.use(express.json());
@@ -64,7 +64,7 @@ app.use((req, res, next) => {
     }
 
     // Start server
-    const port = 5000;
+    const port = process.env.PORT || 5000;
     server.listen({
       port,
       host: "0.0.0.0",

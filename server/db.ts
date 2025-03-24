@@ -1,10 +1,16 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
+import { neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import ws from "ws";
 import * as schema from "@shared/schema";
+import pg from 'pg';
+const { Pool } = pg;
+import dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 
 neonConfig.webSocketConstructor = ws;
-neonConfig.wsProxy = (host) => `ws://0.0.0.0:5000/v2`;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -12,8 +18,8 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ 
+export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  keepAlive: true
 });
-export const db = drizzle({ client: pool, schema });
+
+export const db = drizzle(pool);
